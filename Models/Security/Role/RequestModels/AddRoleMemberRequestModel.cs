@@ -1,0 +1,9 @@
+﻿namespace Quote2Invoice.UI.Models.Security.Role.RequestModels
+{
+  public class AddRoleMemberRequestModel
+  {
+    public int RoleId { get; set; }
+    public string Username { get; set; }
+    public string CreateUser { get; set; }
+  }
+}

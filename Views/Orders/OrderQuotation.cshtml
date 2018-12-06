@@ -1,0 +1,337 @@
+﻿@model Quote2Invoice.UI.Models.Orders.ResponseModels.OrderQuotationViewModel;
+
+@{
+  ViewData["Title"] = "OrderQuotation";
+  Layout = null;
+}
+
+<style>
+  #main {
+    top: 40px;
+    width: 880px;
+    height: 1110px;
+    border: 1px solid;
+    border-radius: 2px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  #footer {
+    position: relative;
+    width: 880px;
+    height: 165px;
+    border: 1px solid;
+    border-radius: 2px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .bold-row {
+    font-weight: bold;
+  }
+
+  /* ROW 1 */ 
+  #companyprofile {
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    right: 20px;
+    height: 245px;
+    width: 380px;
+    border: 1px solid;
+    border-radius: 2px;
+    padding-left: 10px;
+  }
+
+  #ordersummary {
+    position: absolute;
+    left: 420px;
+    top: 10px;
+    height: 245px;
+    width: 460px;
+  }
+
+  #grid-ordersummary tr td {
+    text-align: center;
+    width: 50%;
+    border: 1px solid;
+    border-radius: 2px;
+  }
+
+  #grid-ordersummary {
+    border-collapse: collapse;
+    display: inline-block;
+    vertical-align: bottom;
+    height: 100%;
+  }
+
+  /* ROW 2 */
+  #contactdetails {
+    position: absolute;
+    left: 20px;
+    top: 265px;
+    right: 20px;
+    height: 130px;
+    width: 380px;
+    border: 1px solid;
+    border-radius: 1px;
+    padding-left: 10px;
+  }
+
+  #deliveryaddress {
+    position: absolute;
+    left: 420px;
+    top: 265px;
+    height: 130px;
+    width: 447px;
+    border: 1px solid;
+    border-radius: 1px;
+    padding-left: 10px;
+  }
+
+  /* ROW 3 */
+
+  #orderdetail {
+    position: absolute;
+    left: 10px;
+    top: 405px;
+    right: 20px;
+    height: 650px;
+    width: 860px;
+    padding-left: 10px;
+  }
+
+  #grid-orderdetail tr td {
+    text-align: right;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    padding: 3px;
+  }
+
+
+  #grid-orderdetail tr:first-child td {
+    border: 1px solid;
+  }
+
+  #grid-orderdetail tr td:first-child {
+    width: 500px;
+    text-align: left;
+  }
+
+  #grid-orderdetail tr td:nth-child(2) {
+    width: 50px;
+    text-align: center;
+  }
+
+  #grid-orderdetail tr td:nth-child(3) {
+    width: 90px;
+    text-align: center;
+  }
+
+  #grid-orderdetail tr:last-child {
+    border-bottom: 1px solid;
+  }
+
+  #grid-orderdetail {
+    border-collapse: collapse;
+  }
+
+  /* ROW 4 */
+
+  #bankingdetails {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    right: 20px;
+    height: 150px;
+    width: 480px;
+    border: 1px solid;
+    border-radius: 1px;
+    padding-left: 10px;
+  }
+
+  #ordertotals {
+    position: absolute;
+    left: 520px;
+    top: 5px;
+    height: 150px;
+    width: 355px;
+  }
+
+  #grid-ordertotals tr td {
+    width: 50%;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid;
+    border-radius: 1px;
+  }
+
+  #grid-ordertotals tr td:last-child {
+    text-align: right;
+  }
+
+  #grid-ordertotals {
+    border-collapse: collapse;
+    display: inline-block;
+    vertical-align: bottom;
+    height: 100%;
+  }
+</style>
+
+<div id="main">
+
+  <!-- COMPANY PROFILE INFORMATION -->
+  <div id="companyprofile">
+    @if (!String.IsNullOrWhiteSpace(Model.CompanyProfile.Country))
+    {
+      <h3 style="text-align: center">@Model.CompanyProfile.DisplayName.ToUpper()</h3>
+      @Html.Raw("Reg.No.") @Model.CompanyProfile.RegistrationNo @Html.Raw("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VAT.No.") @Model.CompanyProfile.TaxReferenceNo<br />
+      <hr />
+      @Model.CompanyProfile.AddressLine1<br />
+      @Model.CompanyProfile.AddressLine2<br />
+      @Model.CompanyProfile.City@Html.Raw(",") @Model.CompanyProfile.Country<br />
+      @Model.CompanyProfile.PostalCode<br />
+      @Html.Raw("Tel: ")@Model.CompanyProfile.TelephoneNo<br />
+      @Html.Raw("Email: ")@Model.CompanyProfile.EmailAddress
+    }
+
+  </div>
+
+  <!-- CUSTOMER AND ORDER DETAILS-->
+  <div id="ordersummary">
+    <table id="grid-ordersummary" width="100%">
+      <tr class="bold-row">
+        <td>ORDER NUMBER</td>
+        <td>DATE CREATED</td>
+      </tr>
+      <tr>
+        <td>@Model.OrderTotals.OrderNo</td>
+        <td>@Model.OrderTotals.CreateDate.ToLongDateString()</td>
+      </tr>
+      <tr class="bold-row">
+        <td>SALES PERSON</td>
+        <td>CUSTOMER NAME</td>
+      </tr>
+      <tr>
+        <td>@Model.OrderTotals.CreateUser</td>
+        <td>
+          @if (!String.IsNullOrWhiteSpace(Model.CustomerDetail.CustomerName))
+          {
+            @Model.CustomerDetail.CustomerName
+          }
+        </td>
+      </tr>
+      <tr class="bold-row">
+        <td>CUSTOMER CONTACT NO</td>
+        <td>CUSTOMER ACC NO</td>
+      </tr>
+      <tr>
+        <td>
+          @if (!String.IsNullOrWhiteSpace(Model.CustomerDetail.CustomerContactNo))
+          {
+            @Model.CustomerDetail.CustomerContactNo
+          }
+        </td>
+        <td>
+          @if (!String.IsNullOrWhiteSpace(Model.CustomerDetail.CustomerAccountNo))
+          {
+            @Model.CustomerDetail.CustomerAccountNo
+          }
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- CUSTOMER CONTACT DETAILS -->
+  <div id="contactdetails">
+    <strong>INVOICE TO</strong><hr />
+    @if (!String.IsNullOrWhiteSpace(Model.CustomerDetail.ContactName))
+    {
+      @Model.CustomerDetail.ContactName <br />
+    }
+    @if (!String.IsNullOrWhiteSpace(Model.CustomerDetail.ContactNo))
+    {
+      @Html.Raw("ContactNo: ")@Model.CustomerDetail.ContactNo <br />
+      @Html.Raw("Email: ")@Model.CustomerDetail.ContactEmailAddress
+    }
+  </div>
+
+  <!-- DELIVERY ADDRESS DETAILS -->
+  <div id="deliveryaddress">
+    <strong>DELIVERY ADDRESS</strong><hr />
+    @if (!String.IsNullOrWhiteSpace(Model.DeliveryAddress.AddressLine1))
+    {
+      @Model.DeliveryAddress.AddressLine1<br />
+      @Model.DeliveryAddress.AddressLine2@Html.Raw(", ")@Model.DeliveryAddress.City<br />
+      @Model.DeliveryAddress.Country<br />
+      @Model.DeliveryAddress.PostalCode
+    }
+  </div>
+
+    <!-- ORDER DETAILS (MAX 27 Lines) -->
+    <div id="orderdetail">
+      <table id="grid-orderdetail" width="100%">
+        <tr class="bold-row">
+          <td>ITEM DESCRIPTION</td>
+          <td>UNIT QTY</td>
+          <td>UNIT PRICE</td>
+          <td>DISCOUNT</td>
+          <td>LINE TOTAL</td>
+        </tr>
+        @foreach (var lineDetail in Model.OrderTotals.OrderLineDetails)
+        {
+          <tr>
+            <td>@lineDetail.ItemDescription</td>
+            <td>@lineDetail.Quantity</td>
+            <td>@lineDetail.UnitPrice.ToString("0.00")</td>
+            <td>@lineDetail.Discount.ToString("0.00")</td>
+            <td>@lineDetail.LineTotal.ToString("0.00")</td>
+          </tr>
+        }
+        @for (int i = Model.OrderTotals.OrderLineDetails.Count; i < 26; i++)
+        {
+          <tr>
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        }
+      </table>
+    </div>
+
+</div>
+<br/>
+<div id="footer">
+
+  <!-- COMPANY BANKING DETAILS -->
+  <div id="bankingdetails">
+    <strong>BANKING DETAILS</strong><hr />
+    @if (!String.IsNullOrWhiteSpace(Model.CompanyProfile.BankingDetails.BankName))
+    {
+      @Html.Raw("Bank: ")@Model.CompanyProfile.BankingDetails.BankName<br />
+      @Html.Raw("Branch Code: ")@Model.CompanyProfile.BankingDetails.BranchCode<br />
+      @Html.Raw("Account No: ")@Model.CompanyProfile.BankingDetails.AccountNo<br />
+      @Html.Raw("Account Type: ")@Model.CompanyProfile.BankingDetails.AccountType<br />
+      @Html.Raw("Account Holder: ")@Model.CompanyProfile.BankingDetails.AccountHolder<br />
+    }
+  </div>
+
+  <!-- ORDER TOTALS -->
+  <div id="ordertotals">
+    <table id="grid-ordertotals" width="100%">
+      <tr class="bold-row">
+        <td>SUB-TOTAL</td>
+        <td>@Model.OrderTotals.SubTotal.ToString("0.00")</td>
+      </tr>
+      <tr class="bold-row">
+        <td>VAT INCLUDED</td>
+        <td>@Model.OrderTotals.VatTotal.ToString("0.00")</td>
+      </tr>
+      <tr class="bold-row">
+        <td>INVOICE TOTAL</td>
+        <td>@Model.OrderTotals.Total.ToString("0.00")</td>
+      </tr>
+    </table>
+  </div>
+
+</div>

@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="~/lib/font-awesome/css/font-awesome.css" rel="stylesheet" />
+  <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+  <link href="~/css/sb-admin-2.css" rel="stylesheet" />
+  <link href="~/css/metisMenu.css" rel="stylesheet" />
+  <link href="~/lib/jquery-ui/jquery-ui.css" rel="stylesheet" />
+
+  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+  <script src="~/lib/jquery-ui/jquery-ui-1.12.1.min.js"></script>
+  <script src="~/lib/metismenu/metisMenu.min.js"></script>
+  <script src="~/lib/theme/sb-admin-2.js"></script>
+  <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+  <script src="~/lib/jquery-ui/jquery-ui-1.12.1.js"></script>
+  <script src="~/js/site.js"></script>
+</head>
+<body>
+  <div id="wrapper">
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" id="burger">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand">Quote2Invoice</a>
+      </div>
+      <!-- /.navbar-header -->
+
+      <div class="navbar-default sidebar" role="navigation">
+        <div class="sidebar-nav navbar-collapse">
+          <ul class="nav" id="side-menu">
+            <li>
+              <a asp-controller="Orders" asp-action="Index"><i class="fa fa-home  fa-fw"></i> Home</a>
+            </li>
+            <li>
+              <a asp-controller="Authenticate" asp-action="UpdateProfile"><i class="fa fa-user fa-fw"></i> Update Profile</a>
+            </li>
+            <li class="divider"></li>
+            <li>
+              <a data-toggle="modal" data-target="#SignOutModal" style="cursor:pointer"><i class="fa fa-sign-out fa-fw"></i> Sign Out</a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.sidebar-collapse -->
+      </div>
+      <!-- /.navbar-static-side -->
+    </nav>
+
+    <div id="page-wrapper">
+      @RenderBody()
+    </div>
+
+    <!-- Loader Modal -->
+    <div class="modal fade" id="loader" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+      <div class="loader-dialog modal-xsm" role="document">
+        <div class="modal-content">
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sign Out Modal -->
+    <div class="modal fade" id="SignOutModal" tabindex="-1" role="dialog" aria-labelledby="SignOutModalLabel" aria-hidden="true">
+      <div class="modal-dialog" style="width:250px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="SignOutModalLabel">Sign Out</h4>
+          </div>
+          <div class="modal-body">
+            Are you sure you would like to sign out?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-thin btn-primary" id="logout">Yes</button>
+            <button type="button" class="btn-thin btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+  </div>
+
+  @RenderSection("Scripts", required: false)
+
+  <script>
+    $('#logout').click(function (event) {
+      window.location.href = '@Url.Action("Logout", "Authenticate")';
+    });
+  </script>
+
+</body>
+</html>
