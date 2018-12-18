@@ -6,6 +6,7 @@ using Quote2Invoice.UI.Models.Security.Authenticate.InputModels;
 using Quote2Invoice.UI.Shared;
 using System;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace Quote2Invoice.UI.Controllers
 {
@@ -14,12 +15,16 @@ namespace Quote2Invoice.UI.Controllers
     protected IWebApiCaller WebApiCaller;
     protected ICookieHelper CookieHelper;
     protected IUserAgentHelper UserAgentHelper;
+    protected ISecurityHelper SecurityHelper;
+    protected IConfiguration Configuration;
 
-    public AuthenticateController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper, IUserAgentHelper userAgentHelper)
+    public AuthenticateController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper, IUserAgentHelper userAgentHelper, ISecurityHelper securityHelper, IConfiguration configuration)
     {
       WebApiCaller = webApiCaller;
       CookieHelper = cookieHelper;
+      SecurityHelper = securityHelper;
       UserAgentHelper = userAgentHelper;
+      Configuration = configuration;
     }
 
     public ViewResult Index(AuthenticateViewModel model)
@@ -34,9 +39,9 @@ namespace Quote2Invoice.UI.Controllers
 
     public ViewResult UpdateProfile(UpdateProfileModel viewModel)
     {
-      var loggedInUser = CookieHelper.GetCookie<UserModel>("CurrentUser");
+      var currentUser = CookieHelper.GetCookie<string>("CurrentUser");
 
-      var updateProfileModel = WebApiCaller.PostAsync<UpdateProfileModel>("WebApi:Authenticate:FindUserProfile", new FindUserRequestModel { Username = loggedInUser.Username });
+      var updateProfileModel = WebApiCaller.PostAsync<UpdateProfileModel>("WebApi:Authenticate:FindUserProfile", new FindUserRequestModel { Username = currentUser });
 
       return View("ChangePassword", updateProfileModel);
     }
@@ -67,17 +72,20 @@ namespace Quote2Invoice.UI.Controllers
     {
       try
       {
-        string browserInfo = "Unable to determine";
-        string deviceInfo = "Unable to determine";
+        string browserInfo = "Unable to determine"; // defaults
+        string deviceInfo = "Unable to determine";  // defaults
 
-        try
+        if (!Convert.ToBoolean(Configuration["MockData.Enabled"]))
         {
-          UserAgentHelper.SetUserAgent(Request.Headers["User-Agent"]);
-          //browserInfo = UserAgentHelper.Browser.Name + " " + UserAgentHelper.Browser.Version + " " + UserAgentHelper.Browser.Major;
-          //deviceInfo = UserAgentHelper.OS.Name + " " + UserAgentHelper.OS.Version;
+          try
+          {
+            UserAgentHelper.SetUserAgent(Request.Headers["User-Agent"]);
+            browserInfo = UserAgentHelper.Browser.Name + " " + UserAgentHelper.Browser.Version + " " + UserAgentHelper.Browser.Major;
+            deviceInfo = UserAgentHelper.OS.Name + " " + UserAgentHelper.OS.Version;
+          }
+          catch { }
         }
-        catch {  }
-
+        
         var userModel = WebApiCaller.PostAsync<UserModel>("WebApi:Authenticate:Login", new LoginRequestModel
         {
           Username = username,
@@ -91,7 +99,7 @@ namespace Quote2Invoice.UI.Controllers
           if(userModel.IsAuthenticated)
           {
             CookieHelper.SignIn(userModel);
-            CookieHelper.SetCookie("CurrentUser", userModel); // put the encrypted version of the api session token
+            SecurityHelper.AddSessionUser(userModel);
             return RedirectToAction("Index", "Orders");
           }
           else
@@ -114,17 +122,19 @@ namespace Quote2Invoice.UI.Controllers
       {
         if (ModelState.IsValid)
         {
-          // default browser detection values
-          string browserInfo = "Unable to determine";
-          string deviceInfo = "Unable to determine";
+          string browserInfo = "Unable to determine"; // defaults
+          string deviceInfo = "Unable to determine";  // defaults
 
-          try
+          if (!Convert.ToBoolean(Configuration["MockData.Enabled"]))
           {
-            UserAgentHelper.SetUserAgent(Request.Headers["User-Agent"]);
-            //browserInfo = UserAgentHelper.Browser.Name + " " + UserAgentHelper.Browser.Version + " " + UserAgentHelper.Browser.Major;
-            //deviceInfo = UserAgentHelper.OS.Name + " " + UserAgentHelper.OS.Version;
+            try
+            {
+              UserAgentHelper.SetUserAgent(Request.Headers["User-Agent"]);
+              browserInfo = UserAgentHelper.Browser.Name + " " + UserAgentHelper.Browser.Version + " " + UserAgentHelper.Browser.Major;
+              deviceInfo = UserAgentHelper.OS.Name + " " + UserAgentHelper.OS.Version;
+            }
+            catch { }
           }
-          catch { }
 
           var userModel = WebApiCaller.PostAsync<UserModel>("WebApi:Authenticate:Register", new RegisterUserRequestModel
           {
@@ -141,7 +151,7 @@ namespace Quote2Invoice.UI.Controllers
           if (userModel != null)
           {
             CookieHelper.SignIn(userModel);
-            CookieHelper.SetCookie("CurrentUser", userModel);
+            SecurityHelper.AddSessionUser(userModel);
             return RedirectToAction("Index", "Orders");
           }
           else

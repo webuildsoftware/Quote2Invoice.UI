@@ -21,13 +21,15 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
   {
     protected IConfiguration Configuration;
     protected ICookieHelper CookieHelper;
+    protected ISecurityHelper SecurityHelper;
 
     protected MockWebApi MockWebApi;
 
-    public WebApiCaller(IConfiguration configuration, ICookieHelper cookieHelper)
+    public WebApiCaller(IConfiguration configuration, ICookieHelper cookieHelper, ISecurityHelper securityHelper)
     {
       Configuration = configuration;
       CookieHelper = cookieHelper;
+      SecurityHelper = securityHelper;
     }
 
     public T PostAsync<T>(string urlConfig, object requestModel)
@@ -47,10 +49,10 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
 
       var webApiUrl = Configuration[urlConfig];
 
-      var loggedInUser = CookieHelper.GetCookie<UserModel>("CurrentUser");
+      var CurrentUser = SecurityHelper.GetSessionUser(CookieHelper.GetCookie<UserModel>("CurrentUser"));
 
-      if(loggedInUser != null)
-        webApiUrl +="?token=" + loggedInUser.ApiSessionToken;
+      if(CurrentUser != null)
+        webApiUrl +="?token=" + CurrentUser.ApiSessionToken;
 
       var webApiResponse = PostRequest(webApiUrl, requestModel);
 

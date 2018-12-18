@@ -1,6 +1,7 @@
-﻿@{
+﻿@model Quote2Invoice.UI.Models.Orders.ResponseModels.OrderCustomerViewModel
+
+@{
   ViewData["Title"] = "OrderCustomer";
-  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <style>
@@ -8,15 +9,15 @@
     padding: 3px;
   }
 
-  .main div span {
-    font-size: 11px;
-    font-weight: bold;
-  }
+    .main div span {
+      font-size: 11px;
+      font-weight: bold;
+    }
 </style>
 <div class="row">
   <div class="col-md-5">
     <h4 class="page-header-sm">
-      Customer Details (order <span id="orderno"></span>)
+      Customer Details (order <span id="orderno">@Model.CustomerDetails.OrderId</span>)
     </h4>
     <div class="main">
       <div>
@@ -24,38 +25,41 @@
         <br />
         <select id="existingcustomers" class="form-control-small" style="width:200px">
           <option value='0'>New Customer</option>
+          @for(int i = 0; i < Model.Customers.Count; i++)
+          {
+            <option value="@Model.Customers[i].CustomerId">@Model.Customers[i].CustomerName</option>
+          }
         </select>
       </div>
       <div>
         <span>Name *</span>
         <br />
-        <input type="text" id="customername" placeholder="Enter Name" class="form-control-small" style="width:200px" />
+        <input type="text" id="customername" placeholder="Enter Name" class="form-control-small" style="width:200px" value="@Model.CustomerDetails.CustomerName" />
       </div>
       <div>
         <span>Other</span>
         <br />
-        <textarea id="customerdetails" class="form-control-normal" rows="3" maxlength="155">
-        </textarea>
+        <textarea id="customerdetails" class="form-control-normal" rows="3" maxlength="255">@Model.CustomerDetails.CustomerDetails</textarea>
       </div>
       <div>
         <span>Email</span>
         <br />
-        <input type="text" id="customeremail" class="form-control-small" placeholder="Enter Email" style="width:200px" />
+        <input type="text" id="customeremail" class="form-control-small" placeholder="Enter Email" style="width:200px" value="@Model.CustomerDetails.CustomerEmailAddress" />
       </div>
       <div>
         <span>Account No</span>
         <br />
-        <input type="text" id="customeraccountno" class="form-control-small" placeholder="Enter Account No" style="width:200px"  />
+        <input type="text" id="customeraccountno" class="form-control-small" placeholder="Enter Account No" style="width:200px" value="@Model.CustomerDetails.CustomerAccountNo" />
       </div>
       <div>
         <span>Contact No *</span>
         <br />
-        <input type="text" id="customercontactno" class="number form-control-small" placeholder="Enter Contact No" maxlength="10" style="width:200px"  />
+        <input type="text" id="customercontactno" class="number form-control-small" placeholder="Enter Contact No" maxlength="10" style="width:200px" value="@Model.CustomerDetails.CustomerContactNo" />
       </div>
       <div>
         <span>Cell No</span>
         <br />
-        <input type="text" id="customermobileno" class="number form-control-small" placeholder="Enter Cell No" maxlength="10"  style="width:200px" />
+        <input type="text" id="customermobileno" class="number form-control-small" placeholder="Enter Cell No" maxlength="10" style="width:200px" value="@Model.CustomerDetails.CustomerMobileNo" />
       </div>
       <div class="main" id="pnlContact" style="display: none;">
         <hr style="margin-top:10px; margin-bottom:2px" />
@@ -64,22 +68,26 @@
           <br />
           <select id="existingcontacts" class="form-control-small" style="width:200px">
             <option value='0'>New Contact</option>
+            @for (int i = 0; i < Model.Contacts.Count; i++)
+            {
+              <option value="@Model.Contacts[i].ContactId">@Model.Contacts[i].ContactName</option>
+            }
           </select>
         </div>
         <div>
           <span>Contact Person Name</span>
           <br />
-          <input type="text" id="contactname" placeholder="Enter Name" class="form-control-small" style="width:200px" />
+          <input type="text" id="contactname" placeholder="Enter Name" class="form-control-small" style="width:200px" value="@Model.CustomerDetails.ContactName"  />
         </div>
         <div>
           <span>Email</span>
           <br />
-          <input type="text" id="contactemail" placeholder="Enter Email" class="form-control-small" style="width:200px" />
+          <input type="text" id="contactemail" placeholder="Enter Email" class="form-control-small" style="width:200px" value="@Model.CustomerDetails.ContactEmailAddress"  />
         </div>
         <div>
-          <span>Cell No</span>
+          <span>Contact No</span>
           <br />
-          <input type="text" id="contactno" class="number form-control-small" placeholder="Enter Cell No" maxlength="10" style="width:200px"  />
+          <input type="text" id="contactno" class="number form-control-small" placeholder="Enter Cell No" maxlength="10" style="width:200px" value="@Model.CustomerDetails.ContactNo"  />
         </div>
       </div>
       <div style="padding-top: 10px">
@@ -91,7 +99,7 @@
   </div>
 
 </div>
-<input id="hidden" type="button" style="visibility: hidden" data-toggle="modal" data-target="#ConfirmModal" />
+
 <!-- Saved Successful Popup -->
 <div class="modal fade" id="ConfirmModal" tabindex="-1" role="dialog" aria-labelledby="ConfirmModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="width:280px">
@@ -108,144 +116,107 @@
     </div>
   </div>
 </div>
-
-<input type="hidden" id="hdnCustomerId" />
+<input type="hidden" id="hdncustomerid" value="@Model.CustomerDetails.CustomerId" />
+<input type="hidden" id="hdnorderid" value="@Model.CustomerDetails.OrderId" />
+<input type="hidden" id="hdnorderno" value="@Model.CustomerDetails.OrderNo" />
+<input type="hidden" id="hdncontact" value="@Model.CustomerDetails.ContactAdded.ToString().ToLower()" />
+<input type="hidden" id="hdncontactid" value="@Model.CustomerDetails.ContactId" />
+<input id="hidden" type="button" style="visibility: hidden" data-toggle="modal" data-target="#ConfirmModal" />
 
 @section Scripts{
   <script>
-    var queryString = location.href.split("?")[1];
-    orderId = 0;
-    orderNo = "";
-
-    var contactAdded = false;
-    var order = {
-      "customerContacts": [],
-      "customers": []
-    };
+    var orderId = $('#hdnorderid').val();
+    var orderNo = $('#hdnorderno').val();
+    var customerId = $('#hdncustomerid').val();
+    var contactAdded = $('#hdncontact').val();
+    var contactId = $('#hdncontactid').val();
 
     $(document).ready(function () {
 
-      // get the customers belonging to the company profile and/or user
-      $.ajax({
-        url: '@Url.Action("GetOrderCustomers")',
-        type: "POST",
-        success: function (customerlist) {
-          $.each(customerlist, function (index, customer) {
+      if (customerId > 0) 
+        $("#existingcustomers").val(customerId);
 
-            order.customers.push(
-              {
-                "customerid": customer.customerId, "customername": customer.customerName,
-                "customerdetails": customer.customerDetails, "contactno": customer.contactNo,
-                "accountno": customer.accountNo, "mobileno": customer.mobileNo, "emailaddress": customer.emailAddress
-              });
-
-            $("#existingcustomers").append("<option value='" + customer.customerId + "' index='" + (index) +"'>" + customer.customerName + "</option>");
-          });
-
-          $("#customerdetails").html("");
-        },
-        error: function (xhr, options, error) {
-          alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
-        }
-      });
-
-      if (queryString != undefined) {
-        // get order id from query string
-        orderId = queryString.split("&")[0].split("=")[1];
-        orderNo = queryString.split("&")[1].split("=")[1];
-        $("#orderno").text(orderNo);
-
-        // get the customers details for the existing order
-        $.ajax({
-          url: '@Url.Action("GetOrderCustomerDetails")' + '?orderId=' + orderId,
-          type: "POST",
-          success: function (dataOrderDetails) {
-            if (dataOrderDetails == null)
-              return;
-
-            setTimeout(function () {
-              $("#existingcustomers").val(dataOrderDetails.customerId);
-              $("#existingcustomers").change();
-            }, 200);
-
-            setTimeout(function () {
-              if (dataOrderDetails.contactId != 0) {
-                
-                contactAdded = true;
-                $('#pnlContact').show();
-                $("#existingcontacts").val(dataOrderDetails.contactId);
-                $("#existingcontacts").change();
-              }
-            }, 600);
-
-          },
-          error: function (xhr, options, error) {
-            alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
-          }
-        });
+      if (contactAdded) {
+        $("#existingcontacts").val(contactId);
+        $('#pnlContact').fadeIn(500);
+        var scrollPos = $("#pnlContact").offset().top;
+        $(window).scrollTop(scrollPos);
       }
 
     });
 
     $("#existingcustomers").change(function () {
-        var customerId = $(this).val();
+        $("#customername").val("");
+        $("#customerdetails").val("");
+        $("#customercontactno").val("");
+        $("#customeremail").val("");
+        $("#customeraccountno").val("");
+        $("#customermobileno").val("");
+        refreshContactsPanel();
 
+        customerId = $(this).val();
+        
         if (customerId != "0") {
 
+          GlobalLoader(true);
           $.ajax({
-            url: '@Url.Action("GetCustomerContacts")',
+            url: '@Url.Action("GetCustomerContactDetails")',
             data: { customerId: customerId },
             type: "POST",
-            success: function (customercontactslist) {
+            success: function (data) {
 
-              order.customerContacts = [];
               $("#existingcontacts").html("");
               $("#existingcontacts").append("<option value='0'>New Contact</option>");
 
               // loop through contacts and append to the contacts drop down list
-              $.each(customercontactslist, function (index, contact) {
+              $.each(data.contacts, function (index, contact) {
 
-                order.customerContacts.push(
-                  {
-                    "contactid": contact.contactId, "contactname": contact.contactName, "contactno": contact.contactNo, "emailaddress": contact.emailAddress
-                  });
-
-                $("#existingcontacts").append("<option value='" + contact.contactId + "' index='" + (index) + "'>" + contact.contactName + "</option>");
+                $("#existingcontacts").append("<option value='" + contact.contactId + "'>" + contact.contactName + "</option>");
               });
 
-              // append the customer details to the customer details panel
-              var customerindex = $('option:selected', $("#existingcustomers")).attr('index');
+              $("#customername").val(data.customer.customerName);
+              $("#customerdetails").val(data.customer.customerDetails);
+              $("#customercontactno").val(data.customer.contactNo);
+              $("#customeremail").val(data.customer.emailAddress);
+              $("#customeraccountno").val(data.customer.accountNo);
+              $("#customermobileno").val(data.customer.mobileNo);
 
-              $("#customername").val(order.customers[customerindex].customername);
-              $("#customerdetails").val(order.customers[customerindex].customerdetails);
-              $("#customercontactno").val(order.customers[customerindex].contactno);
-              $("#customeraccountno").val(order.customers[customerindex].accountno);
-              $("#customermobileno").val(order.customers[customerindex].mobileno);
-              $("#customeremail").val(order.customers[customerindex].emailaddress);
-
-              if(contactAdded)
-                refreshContactsPanel();
+              $('#addcontact').click();
+              GlobalLoader(false);
             },
             error: function (xhr, options, error) {
               alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
             }
           });
+
         }
 
       });
 
     $("#existingcontacts").change(function () {
+
       refreshContactsPanel();
-      var selectedContact = $(this).val();
+      var contactId = $(this).val();
 
-      if (selectedContact != "") {
-        var index = $('option:selected', $("#existingcontacts")).attr('index');
+      if (contactId != "0") {
 
-        // populate the contact form inputs
-        $("#contactname").val(order.customerContacts[index].contactname);
-        $("#contactno").val(order.customerContacts[index].contactno);
-        $("#contactemail").val(order.customerContacts[index].emailaddress);
-        
+        GlobalLoader(true);
+        $.ajax({
+          url: '@Url.Action("GetContactPersonDetails")',
+          data: { contactId: contactId },
+          type: "POST",
+          success: function (data) {
+            $("#contactname").val(data.contactName);
+            $("#contactno").val(data.contactNo);
+            $("#contactemail").val(data.emailAddress);
+
+            GlobalLoader(false);
+          },
+          error: function (xhr, options, error) {
+            alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
+          }
+        });
+
       }
 
     });
@@ -282,7 +253,6 @@
         },
         success: function (data) {
           GlobalLoader(false);
-          $("#hdnCustomerId").val(data.customerId);
           $("#hidden").click();
         },
         error: function (xhr, options, error) {
@@ -307,18 +277,18 @@
     });
 
     $("#deliveryaddress").click(function () {
-      window.location.href = '@Url.Action("AddressDetail")' + '?orderId=' + orderId + '&orderNo=' + orderNo + '&customerId=' + $("#hdnCustomerId").val();
+      window.location.href = '@Url.Action("AddressDetail")' + '?orderId=' + orderId + '&orderNo=' + orderNo + '&customerId=' + $("#existingcustomers").val();
     });
 
     $('#addcontact').click(function () {
-      if ($('#pnlContact').css('display') == 'none') {
+      if (!contactAdded) {
         contactAdded = true;
         $('#pnlContact').fadeIn(500);
         var scrollPos = $("#pnlContact").offset().top;
         $(window).scrollTop(scrollPos);
 
       }
-      else { 
+      else {
         contactAdded = false;
         $('#pnlContact').fadeOut(500);
         var scrollPos = $("#addcontact").offset().top;
@@ -326,7 +296,6 @@
       }
 
     });
-
 
     $("#cancel").click(function () {
       location.href = '@Url.Action("Index", "Orders")'

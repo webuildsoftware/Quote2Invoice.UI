@@ -739,6 +739,197 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
         ResponseContent = responseDownloadOrder
       });
 
+      // WebApi:Orders:LoadOrderDetail
+      var responseLoadOrderDetailModel = new OrderDetailViewModel
+      {
+        OrderId = 0,
+        OrderNo = "",
+        VatRate = Convert.ToDecimal(0.15),
+        OrderNoSeed = 1
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:LoadOrderDetail",
+        RequestModel = new LoadOrderDetailRequestModel { OrderId = 0 },
+        ResponseContent = responseLoadOrderDetailModel
+      });
+
+      // WebApi:Orders:LoadOrderCustomerDetail
+      var requestModelLoadOrderCustomerDetail = new LoadOrderCustomerRequestModel { OrderId = 1, Username = "zunaid" };
+
+      var contactList = new List<ContactModel>
+      {
+        new ContactModel
+        {
+          CustomerId = 1,
+          ContactId = 1,
+          ContactName = "Chocalate",
+          ContactNo = "0217548899",
+          EmailAddress = "Chocalate@capetown.gov.za",
+          CreateUser ="zunaid",
+          CreateDate = DateTime.Now
+        },
+        new ContactModel
+        {
+          CustomerId = 1,
+          ContactId = 2,
+          ContactName = "2",
+          ContactNo = "2",
+          EmailAddress = "",
+          CreateUser ="zunaid",
+          CreateDate = DateTime.Now
+        },
+        new ContactModel
+        {
+          CustomerId = 1,
+          ContactId = 3,
+          ContactName = "Swedend",
+          ContactNo = "0726985223",
+          EmailAddress = "Swedend@capetown.gov.za",
+          CreateUser ="zunaid",
+          CreateDate = DateTime.Now
+        }
+      };
+
+      var responseModelLoadOrderCustomerDetail = new OrderCustomerViewModel
+      {
+        Customers = new List<CustomerModel>
+        {
+          new CustomerModel
+          {
+            CompanyProfileId = 1,
+            CustomerId = 1,
+            CustomerName = "1",
+            CreateUser = "zunaid",
+            CreateDate = DateTime.Now
+          },
+          new CustomerModel
+          {
+            CompanyProfileId = 1,
+            CustomerId = 2,
+            CustomerName = "The Juggernauts",
+            CreateUser = "zunaid",
+            CreateDate = DateTime.Now
+          },
+          new CustomerModel
+          {
+            CompanyProfileId = 1,
+            CustomerId = 3,
+            CustomerName = "Water Inc.",
+            CreateUser = "zunaid",
+            CreateDate = DateTime.Now
+          }
+        },
+        CustomerDetails = new OrderCustomerDetailModel
+        {
+          OrderId = 1,
+          OrderNo = "",
+          CustomerId = 1,
+          CustomerName = "1",
+          CustomerDetails = "1",
+          CustomerContactNo = "1",
+          CustomerAccountNo = "1",
+          CustomerMobileNo = "1",
+          CustomerEmailAddress = "",
+          ContactId = 2,
+          ContactName = "2",
+          ContactNo = "2",
+          ContactEmailAddress = "",
+          ContactAdded = true
+        },
+        Contacts = contactList
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:LoadOrderCustomerDetail",
+        RequestModel = requestModelLoadOrderCustomerDetail,
+        ResponseContent = responseModelLoadOrderCustomerDetail
+      });
+
+      // WebApi:Orders:GetCustomerContactDetails
+      contactList = new List<ContactModel>
+      {
+        new ContactModel
+        {
+          CustomerId = 2,
+          ContactId = 4,
+          ContactName = "new",
+          ContactNo = "new",
+          EmailAddress = "new.gov.za",
+          CreateUser ="zunaid",
+          CreateDate = DateTime.Now
+        },
+        new ContactModel
+        {
+          CustomerId = 2,
+          ContactId = 5,
+          ContactName = "asdf",
+          ContactNo = "asdf",
+          EmailAddress = "",
+          CreateUser ="zunaid",
+          CreateDate = DateTime.Now
+        },
+        new ContactModel
+        {
+          CustomerId = 2,
+          ContactId = 6,
+          ContactName = "11111",
+          ContactNo = "11111",
+          EmailAddress = "1111@capetown.gov.za",
+          CreateUser ="zunaid",
+          CreateDate = DateTime.Now
+        }
+      };
+
+      var customerDetails = new CustomerModel
+      {
+        CompanyProfileId = 1,
+        CustomerId = 2,
+        CustomerName = "City of Port Elizabeth",
+        CustomerDetails = "Some Long Detailed Description",
+        ContactNo = "0214178855",
+        EmailAddress = "comeemail@gmail.com",
+        MobileNo = "0741102255",
+        AccountNo = "AD4456",
+      };
+
+      var responseModelGetCustomerContacts = new CustomerContactDetailsModel
+      {
+        Contacts = contactList,
+        Customer = customerDetails
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:GetCustomerContactDetails",
+        RequestModel = new GetCustomerContactsRequestModel { CustomerId = 2 },
+        ResponseContent = responseModelGetCustomerContacts
+      });
+
+      //WebApi:Orders:GetContactPersonDetails
+
+      var requestGetContactPersonDetailsModel = new GetContactPersonDetailsRequestModel { ContactId = 6 };
+
+      var responseGetContactPersonDetailsModel = new ContactModel
+      {
+        CustomerId = 1,
+        ContactId = 6,
+        ContactName = "City of Port Elizabeth",
+        ContactNo = "0214178855",
+        EmailAddress = "comeemail@gmail.com",
+        CreateUser = "zunaid",
+        CreateDate = DateTime.Now
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:GetContactPersonDetails",
+        RequestModel = requestGetContactPersonDetailsModel,
+        ResponseContent = responseGetContactPersonDetailsModel
+      });
+
       // WebApi:Orders:GetCustomerOrderAddress
       //var responseGetOrderCustomerDetail = new OrderCustomerDetailModel
       //{
@@ -875,41 +1066,6 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
 
       //Responses.Add(new MockApiResponseModel { WepApiUrl = "WebApi:Orders:AddOrderCustomer", RequestModel = inputModel, ResponseContent = responseModel4 });
 
-      //responseModel3 = new List<ContactModel>
-      //{
-      //  new ContactModel
-      //  {
-      //    CustomerId = 2,
-      //    ContactId = 4,
-      //    ContactName = "Chocalate",
-      //    ContactNo = "0217548899",
-      //    EmailAddress = "Chocalate@capetown.gov.za",
-      //    CreateUser ="zunaid",
-      //    CreateDate = DateTime.Now
-      //  },
-      //  new ContactModel
-      //  {
-      //    CustomerId = 2,
-      //    ContactId = 5,
-      //    ContactName = "Taster",
-      //    ContactNo = "0825554444",
-      //    EmailAddress = "Taster@capetown.gov.za",
-      //    CreateUser ="zunaid",
-      //    CreateDate = DateTime.Now
-      //  },
-      //  new ContactModel
-      //  {
-      //    CustomerId = 2,
-      //    ContactId = 6,
-      //    ContactName = "Swedend",
-      //    ContactNo = "0726985223",
-      //    EmailAddress = "Swedend@capetown.gov.za",
-      //    CreateUser ="zunaid",
-      //    CreateDate = DateTime.Now
-      //  }
-      //};
-
-      //Responses.Add(new MockApiResponseModel { WepApiUrl = "WebApi:Orders:GetCustomerContacts", RequestModel = new GetCustomerContactsRequestModel { CustomerId = 2 }, ResponseContent = responseModel3 });
 
       // WebApi: Orders: GetOrderDetail
       var responseGetOrderDetail = new OrderDetailModel

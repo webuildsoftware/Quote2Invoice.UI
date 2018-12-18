@@ -1,12 +1,19 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Quote2Invoice.UI.Models.Security.Authenticate.ResponseModels;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using Quote2Invoice.UI.Data;
+using Quote2Invoice.UI.Data.Entities;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace Quote2Invoice.UI.Shared
 {
   public interface ISecurityHelper
   {
+    void AddSessionUser(UserModel user);
+    UserModel GetSessionUser(string username);
     string SaltedHashAlgorithm(string password, string saltValue);
     bool ValidatePassword(string password, string passwordHash);
     string CreateRandomPassword(int length);
@@ -14,10 +21,12 @@ namespace Quote2Invoice.UI.Shared
   public class SecurityHelper : ISecurityHelper
   {
     protected IConfiguration Configuration;
+    private SecurityContext Context;
 
-    public SecurityHelper(IConfiguration configuration)
+    public SecurityHelper(SecurityContext context, IConfiguration configuration)
     {
       Configuration = configuration;
+      Context = context;
     }
 
     public string SaltedHashAlgorithm(string password, string saltValue)
@@ -68,5 +77,26 @@ namespace Quote2Invoice.UI.Shared
       return encryptor.GetBytes(outputBytes);
     }
 
+    public void AddSessionUser(UserModel user)
+    {
+      var session = new Session
+      {
+        Key = user.Username,
+        Value = JsonConvert.SerializeObject(user),
+        Application = Configuration["ApplicationName"]
+      };
+
+      Context.Sessions.Add(session);
+      Context.SaveChanges();
+    }
+
+    public UserModel GetSessionUser(string username)
+    {
+      // get the latest session from the DB for the username parameter
+      var currentUser = Context.Sessions.OrderByDescending(s => s.SessionId).First(s => s.Key.Trim().ToUpper() == username.Trim().ToUpper() 
+                                                                                     && s.Application.Trim().ToUpper() == Configuration["ApplicationName"].Trim().ToUpper()).Value;
+
+      return JsonConvert.DeserializeObject<UserModel>(currentUser);
+    }
   }
 }

@@ -4,21 +4,24 @@ using Quote2Invoice.UI.Models.Security.Permissions.RequestModels;
 using Quote2Invoice.UI.Shared;
 using Quote2Invoice.UI.Shared.WebApiCaller;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Quote2Invoice.UI.Controllers
 {
-  //[Authorize]
+  [Authorize]
   public class PermissionsController : Controller
   {
     protected IWebApiCaller WebApiCaller;
     protected ICookieHelper CookieHelper;
+    protected ISecurityHelper SecurityHelper;
     protected UserModel CurrentUser;
 
-    public PermissionsController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper)
+    public PermissionsController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper, ISecurityHelper securityHelper)
     {
       WebApiCaller = webApiCaller;
       CookieHelper = cookieHelper;
-      CurrentUser = CookieHelper.GetCookie<UserModel>("LoggedInUser");
+      SecurityHelper = securityHelper;
+      CurrentUser = SecurityHelper.GetSessionUser(CookieHelper.GetCookie<string>("CurrentUser"));
     }
 
     public ViewResult Index()

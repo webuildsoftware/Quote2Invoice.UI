@@ -10,84 +10,43 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
 
-namespace Quote2Invoice.UI.Orders.Controllers
+namespace Quote2Invoice.UI.Controllers
 {
   [Authorize]
   public class OrdersController : Controller
   {
     protected IWebApiCaller WebApiCaller;
     protected ICookieHelper CookieHelper;
+    protected ISecurityHelper SecurityHelper;
     protected UserModel CurrentUser;
 
-    public OrdersController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper)
+    public OrdersController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper, ISecurityHelper securityHelper)
     {
       WebApiCaller = webApiCaller;
       CookieHelper = cookieHelper;
-      CurrentUser = CookieHelper.GetCookie<UserModel>("CurrentUser");
+      SecurityHelper = securityHelper;
+      CurrentUser = SecurityHelper.GetSessionUser(CookieHelper.GetCookie<string>("CurrentUser"));
     }
 
     public ViewResult OrderDetail(int orderId)
     {
-      return View("OrderDetail");
+      var model = WebApiCaller.PostAsync<OrderDetailViewModel>("WebApi:Orders:LoadOrderDetail", new LoadOrderDetailRequestModel { OrderId = orderId });
+
+      return View("OrderDetail", model);
     }
 
-    public ViewResult OrderCustomer(int orderId, string orderNo)
+    public ViewResult OrderCustomer(int orderId)
     {
-      return View("OrderCustomer");
+      var model = WebApiCaller.PostAsync<OrderCustomerViewModel>("WebApi:Orders:LoadOrderCustomerDetail", new LoadOrderCustomerRequestModel { OrderId = orderId , Username = CurrentUser.Username});
+
+      return View("OrderCustomer", model);
     }
 
-    public JsonResult GetOrderCustomerDetails(int orderId)
+    public ViewResult AddressDetail(int customerId)
     {
-      return Json(WebApiCaller.PostAsync<OrderCustomerDetailModel>("WebApi:Orders:GetOrderCustomerDetails", new GetOrderCustomerDetailRequestModel { OrderId = orderId }));
-    }
+      var model = WebApiCaller.PostAsync<List<AddressDetailsModel>>("WebApi:Orders:GetCustomerAddresses", new GetCustomerAddressesRequestModel { CustomerId = customerId });
 
-    public ViewResult AddressDetail()
-    {
-      return View("AddressDetail");
-    }
-
-    public IActionResult ConfirmOrderDetail(int orderId)
-    {
-      try
-      {
-        var result = WebApiCaller.PostAsync<OrderDetailModel>("WebApi:Orders:GetOrderDetail", new GetOrderDetailRequestModel { OrderId = orderId });
-
-        if (result.OrderId == 0)
-          return View("OrderDetail");
-
-        return View("ConfirmOrderDetail", result);
-      }
-      catch (Exception ex)
-      {
-        return RedirectToAction("Error", "Home", new {  IsError = "True", ex.Message, BaseMessage = ex.GetBaseException().Message });
-      }
-    }
-
-    public IActionResult ConfirmOrderCustomer(AddCustomerOrderModel model)
-    {
-      try
-      {
-        var result = WebApiCaller.PostAsync<OrderCustomerDetailModel>("WebApi:Orders:GetOrderCustomerDetails", new GetOrderCustomerDetailRequestModel { OrderId = model.OrderId });
-
-        if (result.OrderId == 0)
-          return View("OrderCustomer");
-
-        return View("ConfirmOrderCustomer", result);
-      }
-      catch (Exception ex)
-      {
-        return RedirectToAction("Error", "Home", new {  IsError = "True", ex.Message, BaseMessage = ex.GetBaseException().Message });
-      }
-    }
-
-    public IActionResult ConfirmCustomerAddress(int orderId, int customerId)
-    {
-      var result = WebApiCaller.PostAsync<AddressDetailsModel>("WebApi:Orders:GetCustomerOrderAddress", new GetOrderAddressRequestModel { OrderId = orderId, CustomerId = customerId });
-
-      if (result.AddressDetailId == 0)
-        return View("AddressDetail");
-
-      return View("ConfirmCustomerAddress");
+      return View("AddressDetail", model);
     }
 
     public IActionResult Index()
@@ -102,6 +61,15 @@ namespace Quote2Invoice.UI.Orders.Controllers
       {
         return RedirectToAction("Error", new GlobalErrorModel(Ex.Message, Ex.StackTrace, Ex.GetBaseException().Message));
       }
+    }
+
+    public IActionResult DownloadOrder(int orderId, string orderNo)
+    {
+      string filename = orderNo + ".pdf";
+
+      var result = WebApiCaller.PostAsync<OrderQuotationViewModel>("WebApi:Orders:GetOrderQuote", new GetOrderQuoteRequestModel { OrderId = orderId, CompanyProfileId = CurrentUser.CompanyProfileId });
+
+      return new ViewAsPdf("OrderQuotation", result) { FileName = filename };
     }
 
     [HttpPost]
@@ -119,13 +87,10 @@ namespace Quote2Invoice.UI.Orders.Controllers
       }
     }
 
-    public IActionResult DownloadOrder(int orderId, string orderNo)
+    [HttpGet]
+    public JsonResult GetOrderCustomerDetails(int orderId)
     {
-      string filename = orderNo + ".pdf";
-
-      var result = WebApiCaller.PostAsync<OrderQuotationViewModel>("WebApi:Orders:GetOrderQuote", new GetOrderQuoteRequestModel { OrderId = orderId, CompanyProfileId = CurrentUser.CompanyProfileId });
-
-      return new ViewAsPdf("OrderQuotation", result) { FileName = filename };
+      return Json(WebApiCaller.PostAsync<OrderCustomerDetailModel>("WebApi:Orders:GetOrderCustomerDetails", new GetOrderCustomerDetailRequestModel { OrderId = orderId }));
     }
 
     [HttpGet]
@@ -216,6 +181,22 @@ namespace Quote2Invoice.UI.Orders.Controllers
     public JsonResult GetOrderCustomers()
     {
       var result = WebApiCaller.PostAsync<List<CustomerModel>>("WebApi:Orders:GetOrderCustomers", new GetOrderCustomersRequestModel { CompanyProfileId = CurrentUser.CompanyProfileId, Username = CurrentUser.Username});
+
+      return Json(result);
+    }
+
+    [HttpPost]
+    public JsonResult GetCustomerContactDetails(int customerId)
+    {
+      var result = WebApiCaller.PostAsync<CustomerContactDetailsModel>("WebApi:Orders:GetCustomerContactDetails", new GetCustomerContactDetailsRequestModel { CustomerId = customerId });
+
+      return Json(result);
+    }
+
+    [HttpPost]
+    public JsonResult GetContactPersonDetails(int contactId)
+    {
+      var result = WebApiCaller.PostAsync<ContactModel>("WebApi:Orders:GetContactPersonDetails", new GetContactPersonDetailsRequestModel { ContactId = contactId });
 
       return Json(result);
     }

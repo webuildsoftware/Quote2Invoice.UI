@@ -11,6 +11,8 @@ using System.Globalization;
 using Rotativa.AspNetCore;
 using System.IO;
 using System;
+using Quote2Invoice.UI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Quote2Invoice.UI
 {
@@ -43,8 +45,11 @@ namespace Quote2Invoice.UI
           options.ExpireTimeSpan = new TimeSpan(0, Convert.ToInt32(Configuration["CookieExpireTimeSpan"]), 0);
         });
 
+      services.AddDbContext<SecurityContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Quote2Invoice.Security")));
+
       services.AddTransient<IWebApiCaller, WebApiCaller>();
       services.AddTransient<ICookieHelper, CookieHelper>();
+      services.AddTransient<ISecurityHelper, SecurityHelper>();
       services.AddTransient<IUserAgentHelper, UserAgentHelper>();
       services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     }

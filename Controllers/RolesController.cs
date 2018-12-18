@@ -9,18 +9,20 @@ using Quote2Invoice.UI.Models.Security.Authenticate.ResponseModels;
 
 namespace Quote2Invoice.UI.Controllers
 {
-  //[Authorize]
+  [Authorize]
   public class RolesController : Controller
   {
     protected IWebApiCaller WebApiCaller;
     protected ICookieHelper CookieHelper;
+    protected ISecurityHelper SecurityHelper;
     protected UserModel CurrentUser;
 
-    public RolesController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper)
+    public RolesController(IWebApiCaller webApiCaller, ICookieHelper cookieHelper, ISecurityHelper securityHelper)
     {
       WebApiCaller = webApiCaller;
       CookieHelper = cookieHelper;
-      CurrentUser = CookieHelper.GetCookie<UserModel>("LoggedInUser");
+      SecurityHelper = securityHelper;
+      CurrentUser = SecurityHelper.GetSessionUser(CookieHelper.GetCookie<string>("CurrentUser"));
     }
 
     public ViewResult Index()

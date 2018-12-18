@@ -1,4 +1,5 @@
-﻿
+﻿@model Quote2Invoice.UI.Models.Orders.ResponseModels.OrderDetailViewModel
+
 @{
   ViewData["Title"] = "OrderDetail";
 }
@@ -27,7 +28,7 @@
       <span id="titleheader">Add</span> Order
       <div class="pull-right">
         <input type="text" id="ordernoprefix" style="width:100px" placeholder="Enter Order No" maxlength="10" class="form-control-header" />
-        <input type="text" id="ordernoseed" style="width:50px; text-align: right" disabled="disabled" onkeypress="return false;" class="form-control-header" />
+        <input type="text" id="ordernoseed" style="width:50px; text-align: right" disabled="disabled" onkeypress="return false;" class="form-control-header" value="@Model.OrderNoSeed" />
       </div>
     </h4>
   </div>
@@ -95,41 +96,28 @@
   </div>
 </div>
 
+<input type="hidden" id="hdnvatrate" value="@Model.VatRate" />
+<input type="hidden" id="hdnorderid" value="@Model.OrderId" />
+<input type="hidden" id="hdnorderno" value="@Model.OrderNo" />
+
 @section Scripts{
   <script>
     var order = {
       "orderdetail": []
     };
-    var vatrate = 0.0;
-    var ordernoseed = 0;
-    var queryString = location.href.split("?")[1];
-    var orderId = 0;
-    var orderNo = "";
+    var vatrate = $('#hdnvatrate').val();
+    var ordernoseed = $('#ordernoseed').val();
+    var orderId = $('#hdnorderid').val();
+    var orderNo = $('#hdnorderno').val();
 
     $(document).ready(function () {
 
-      $.ajax({
-        url: '@Url.Action("GetVatRate")',
-        type: 'GET',
-        success: function (data) {
-          vatrate = data;
-        },
-        error: function (xhr, options, error) {
-          alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
-        }
-      });
-
-      // check if the view is in edit mode
-      if (queryString != undefined) {
-        // get order id from query string
-        orderId = queryString.split("&")[0].split("=")[1];
-        orderNo = queryString.split("&")[1].split("=")[1];
-
+      if (orderId > 0) {
         // change header and update ordernoprefix
         $("#titleheader").html("Edit");
         $("#ordernoprefix").val(orderNo);
-        $("#ordernoseed").attr("disabled", "disabled");
 
+        GlobalLoader(true);
         $.ajax({
           url: '@Url.Action("GetOrderLineDetails")' + '?orderId=' + orderId,
           type: 'GET',
@@ -146,28 +134,16 @@
                   "linetotal": Number(lineitem.lineTotal)
                 });
             });
-            updateOrderDetailGrid();
-          },
-          error: function (xhr, options, error) {
-            alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
-          }
-        });
-      }
-      else {
-        // new order, so we need the order no seed
-        $.ajax({
-          url: '@Url.Action("GetOrderNoSeed")',
-          type: 'GET',
-          success: function (data) {
-            ordernoseed = data;
-            $("#ordernoseed").val(ordernoseed);
-          },
-          error: function (xhr, options, error) {
-            alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
-          }
-        });
 
+            updateOrderDetailGrid();
+            GlobalLoader(false);
+          },
+          error: function (xhr, options, error) {
+            alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
+          }
+        });
       }
+
     });
 
     $("#lineitem").click(function () {

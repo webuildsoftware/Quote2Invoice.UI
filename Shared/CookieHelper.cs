@@ -14,8 +14,8 @@ namespace Quote2Invoice.UI.Shared
   {
     Task<bool> SignIn(UserModel usermodel);
     Task<bool> SignOut();
-    T GetCookie<T>(string key);
-    void SetCookie(string key, UserModel value);
+    string GetCookie<T>(string key);
+    void SetCookie(string key, string value);
     void RemoveCookie(string key);
   }
 
@@ -45,9 +45,11 @@ namespace Quote2Invoice.UI.Shared
       await HttpContext.HttpContext.SignInAsync(
           Configuration["CookieSecurityScheme"],
           new ClaimsPrincipal(claimsIdentity),
-          new AuthenticationProperties { ExpiresUtc = DateTimeOffset.UtcNow.AddHours(24) });
+          new AuthenticationProperties { ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(Convert.ToInt32(Configuration["CookieExpireTimeSpan"])) });
 
-      result = true; return result;
+      SetCookie("CurrentUser", usermodel.Username);
+
+      return true;
     }
 
     public async Task<bool> SignOut()
@@ -59,34 +61,28 @@ namespace Quote2Invoice.UI.Shared
       result = true; return result;
     }
 
-    public T GetCookie<T>(string key)
+    public string GetCookie<T>(string key)
     {
-
       if (HttpContext.HttpContext.Request.Cookies[key] != null)
       {
         //get username with key
-        var userModel = HttpContext.HttpContext.Request.Cookies[key];
-        //get session token using cookie value
-        //var userModel = HttpContext.HttpContext.Session.GetString(username);
-
-        return JsonConvert.DeserializeObject<T>(userModel);
+        return HttpContext.HttpContext.Request.Cookies[key];
       }
-      else
-        return default(T);
+      return string.Empty;
     }
 
-    public void SetCookie(string key, UserModel user)
+    public void SetCookie(string key, string value)
     {
       if (HttpContext.HttpContext.Request.Cookies[key] != null)
         RemoveCookie(key);
 
-      var option = new CookieOptions();
-      option.Expires = DateTime.Now.AddMinutes(Convert.ToInt32(Configuration["CookieExpireTimeSpan"]));
+      var option = new CookieOptions
+      {
+        Expires = DateTime.Now.AddMinutes(Convert.ToInt32(Configuration["CookieExpireTimeSpan"]))
+      };
 
       //send key and username to cookie
-      HttpContext.HttpContext.Response.Cookies.Append(key, JsonConvert.SerializeObject(user), option);
-      //send cookie keyvalue and sessiontoken to session
-      //HttpContext.HttpContext.Session.SetString(user.Username, JsonConvert.SerializeObject(user));
+      HttpContext.HttpContext.Response.Cookies.Append(key, value, option);
     }
 
     public void RemoveCookie(string key)
