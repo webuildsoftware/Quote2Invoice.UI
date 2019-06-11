@@ -318,7 +318,7 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
       var inputAddOrderCustomer = new AddOrderCustomerRequestModel
       {
         OrderId = 1,
-        CustomerId = 0,
+        CustomerId = 1,
         CustomerName = "1",
         CustomerDetails = "1",
         CustomerContactNo = "1",
@@ -339,6 +339,58 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
         OrderId = 1,
         CustomerId = 1,
         ContactId = 1
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:AddOrderCustomer",
+        RequestModel = inputAddOrderCustomer,
+        ResponseContent = responseAddOrderCustomer
+      });
+
+      inputAddOrderCustomer = new AddOrderCustomerRequestModel
+      {
+        OrderId = 1,
+        CustomerId = 1,
+        CustomerName = "1",
+        CustomerDetails = "1",
+        CustomerContactNo = "1",
+        CustomerMobileNo = "1",
+        CustomerAccountNo = "1",
+        CustomerEmailAddress = null,
+        ContactId = 0,
+        ContactAdded = false,
+        ContactEmailAddress = null,
+        ContactName = null,
+        ContactNo = null,
+        CompanyProfileId = 1,
+        Username = "rowena"
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:AddOrderCustomer",
+        RequestModel = inputAddOrderCustomer,
+        ResponseContent = responseAddOrderCustomer
+      });
+
+      inputAddOrderCustomer = new AddOrderCustomerRequestModel
+      {
+        OrderId = 1,
+        CustomerId = 0,
+        CustomerName = "1",
+        CustomerDetails = "1",
+        CustomerContactNo = "1",
+        CustomerMobileNo = "1",
+        CustomerAccountNo = "1",
+        CustomerEmailAddress = null,
+        ContactId = 0,
+        ContactAdded = false,
+        ContactEmailAddress = null,
+        ContactName = null,
+        ContactNo = null,
+        CompanyProfileId = 1,
+        Username = "zunaid"
       };
 
       Responses.Add(new MockApiResponseModel
@@ -419,6 +471,13 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
       {
         WepApiUrl = "WebApi:Orders:GetCustomerAddresses",
         RequestModel = new GetCustomerAddressesRequestModel { CustomerId = 1 },
+        ResponseContent = responseGetCustomerAddresses
+      });
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:GetCustomerAddresses",
+        RequestModel = new GetCustomerAddressesRequestModel { CustomerId = 0 },
         ResponseContent = responseGetCustomerAddresses
       });
 
@@ -539,6 +598,72 @@ namespace Quote2Invoice.UI.Shared.WebApiCaller
         Country = "South Africa",
         Username = "rowena",
         CustomerId = 1,
+        OrderId = 1
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:AddCustomerOrderAddress",
+        RequestModel = requestAddCustomerOrderAddress,
+        ResponseContent = "Success"
+      });
+
+      //////////////////////
+      ///
+
+      requestAddCustomerOrderAddress = new AddCustomerOrderAddressRequestModel
+      {
+        AddressDetailId = 3,
+        AddressType = "Delivery",
+        AddressLine1 = "City Of Cape Town",
+        AddressLine2 = "Adderley Street",
+        City = "Cape Town",
+        PostalCode = "7800",
+        Country = "South Africa",
+        Username = "zunaid",
+        CustomerId = 0,
+        OrderId = 1
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:AddCustomerOrderAddress",
+        RequestModel = requestAddCustomerOrderAddress,
+        ResponseContent = "Success"
+      });
+
+      requestAddCustomerOrderAddress = new AddCustomerOrderAddressRequestModel
+      {
+        AddressDetailId = 2,
+        AddressType = "Home",
+        AddressLine1 = "24 John Street",
+        AddressLine2 = "Pelican Park",
+        City = "Cape Town",
+        PostalCode = "7786",
+        Country = "South Africa",
+        Username = "zunaid",
+        CustomerId = 0,
+        OrderId = 1
+      };
+
+      Responses.Add(new MockApiResponseModel
+      {
+        WepApiUrl = "WebApi:Orders:AddCustomerOrderAddress",
+        RequestModel = requestAddCustomerOrderAddress,
+        ResponseContent = "Success"
+      });
+
+      requestAddCustomerOrderAddress = new AddCustomerOrderAddressRequestModel
+      {
+        AddressDetailId = 1,
+        AddressType = "Work",
+        AddressLine1 = "24 Victoria Street",
+        AddressLine2 = "Muizenberg",
+        City = "Cape Town",
+        PostalCode = "7786",
+        Country = "South Africa",
+        Username = "zunaid",
+        CustomerId = 0,
         OrderId = 1
       };
 

@@ -92,7 +92,7 @@
       </div>
       <div style="padding-top: 10px">
         <input id="save" value="Save Customer" type="button" class="btn-normal-thin btn-success" />&nbsp;&nbsp;
-        <input id="addcontact" value="Contact Person" type="button" class="btn-normal-thin btn-success" />&nbsp;&nbsp;
+        <input id="addcontact" value="Hide Contact Panel" type="button" class="btn-normal-thin btn-success" />&nbsp;&nbsp;
         <input id="cancel" value="Cancel" type="button" class="btn-normal-thin btn-default" />&nbsp;&nbsp;
       </div>
     </div>
@@ -141,61 +141,63 @@
         $('#pnlContact').fadeIn(500);
         var scrollPos = $("#pnlContact").offset().top;
         $(window).scrollTop(scrollPos);
-      }
+      } 
 
     });
 
     $("#existingcustomers").change(function () {
-        $("#customername").val("");
-        $("#customerdetails").val("");
-        $("#customercontactno").val("");
-        $("#customeremail").val("");
-        $("#customeraccountno").val("");
-        $("#customermobileno").val("");
-        refreshContactsPanel();
+      $("#customername").val("");
+      $("#customerdetails").val("");
+      $("#customercontactno").val("");
+      $("#customeremail").val("");
+      $("#customeraccountno").val("");
+      $("#customermobileno").val("");
+      refreshContactsPanel();
 
-        customerId = $(this).val();
-        
-        if (customerId != "0") {
+      customerId = $(this).val();
 
-          GlobalLoader(true);
-          $.ajax({
-            url: '@Url.Action("GetCustomerContactDetails")',
-            data: { customerId: customerId },
-            type: "POST",
-            success: function (data) {
+      if (customerId != "0") {
 
-              $("#existingcontacts").html("");
-              $("#existingcontacts").append("<option value='0'>New Contact</option>");
+        GlobalLoader(true);
+        $.ajax({
+          url: '@Url.Action("GetCustomerContactDetails")',
+          data: { customerId: customerId },
+          type: "POST",
+          success: function (data) {
 
-              // loop through contacts and append to the contacts drop down list
-              $.each(data.contacts, function (index, contact) {
+            $("#existingcontacts").html("");
+            $("#existingcontacts").append("<option value='0'>New Contact</option>");
 
-                $("#existingcontacts").append("<option value='" + contact.contactId + "'>" + contact.contactName + "</option>");
-              });
+            // loop through contacts and append to the contacts drop down list
+            $.each(data.contacts, function (index, contact) {
 
-              $("#customername").val(data.customer.customerName);
-              $("#customerdetails").val(data.customer.customerDetails);
-              $("#customercontactno").val(data.customer.contactNo);
-              $("#customeremail").val(data.customer.emailAddress);
-              $("#customeraccountno").val(data.customer.accountNo);
-              $("#customermobileno").val(data.customer.mobileNo);
+              $("#existingcontacts").append("<option value='" + contact.contactId + "'>" + contact.contactName + "</option>");
+            });
 
-              $('#addcontact').click();
-              GlobalLoader(false);
-            },
-            error: function (xhr, options, error) {
-              alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
-            }
-          });
+            $("#customername").val(data.customer.customerName);
+            $("#customerdetails").val(data.customer.customerDetails);
+            $("#customercontactno").val(data.customer.contactNo);
+            $("#customeremail").val(data.customer.emailAddress);
+            $("#customeraccountno").val(data.customer.accountNo);
+            $("#customermobileno").val(data.customer.mobileNo);
 
-        }
+            $('#addcontact').click();
+            GlobalLoader(false);
+          },
+          error: function (xhr, options, error) {
+            alert("OOPS! The was an error processing your request - " + jQuery.parseJSON(xhr.responseText).message);
+          }
+        });
 
-      });
+      }
+      else {
+        $("#existingcontacts").html("");
+        $("#existingcontacts").append("<option value='0'>New Contact</option>");
+      }
+
+    });
 
     $("#existingcontacts").change(function () {
-
-      refreshContactsPanel();
       var contactId = $(this).val();
 
       if (contactId != "0") {
@@ -217,6 +219,9 @@
           }
         });
 
+      }
+      else {
+        refreshContactsPanel();
       }
 
     });
@@ -286,13 +291,15 @@
         $('#pnlContact').fadeIn(500);
         var scrollPos = $("#pnlContact").offset().top;
         $(window).scrollTop(scrollPos);
-
+        $('#addcontact').val("Hide Contact Panel");
       }
       else {
         contactAdded = false;
         $('#pnlContact').fadeOut(500);
         var scrollPos = $("#addcontact").offset().top;
         $(window).scrollTop(scrollPos);
+        $('#addcontact').val("Show Contact Panel");
+        refreshContactsPanel();
       }
 
     });
@@ -331,8 +338,7 @@
       $("#contactname").val("");
       $("#contactno").val("");
       $("#contactemail").val("");
-      $("#divcontacts").hide();
-      $("#contacts tbody").html("");
+      $("#existingcontacts").val(0);
     }
 
     function validateEmail(email) {
